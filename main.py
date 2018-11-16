@@ -1,7 +1,7 @@
 from random import randint
 import pygame
 import time
-from os import _exit
+from os import _exit                
 
 White=(255,255,255)                      #some common colours RGB codes
 Black=(000,000,000)
@@ -26,6 +26,7 @@ GameDisplay =pygame.display.set_mode(DisplaySize)
 pygame.display.set_caption("FLAPPY BIRD")       #written Flappy bird in title bar
 Clock=pygame.time.Clock()
                         #loading all the required images from the images folder
+                        #some images were made in paint and other taken from internet
 BackGroundImg=pygame.image.load("Images\\bg img.png")
 BirdImg=pygame.image.load("Images\\bird img.png")
 GroundImg=pygame.image.load("Images\\ground2 img.png")
@@ -34,15 +35,12 @@ PillarUpImg=pygame.image.load("Images\\pillar up img.png")
 PillarDownImg=pygame.image.load("Images\\pillar down img.png")
 GameOverImg=pygame.image.load("Images\\game over img.jpg")
                           #loading all the required sounds from sounds folder
+                          #all sounds were taken from https://www.sounds-resource.com/mobile/flappybird/sound/5309/
 HitSound=pygame.mixer.Sound("Sounds\\sfx_hit.wav")
 DieSound=pygame.mixer.Sound("Sounds\\sfx_die.wav")
 PointSound=pygame.mixer.Sound("Sounds\\sfx_point.wav")
 SwooshSound=pygame.mixer.Sound("Sounds\\sfx_swoosh.wav")
 FlapSound=pygame.mixer.Sound("Sounds\\sfx_flap.wav")
-
-def TextObjects(text, font):
-    textSurface = font.render(text, True, Black)    
-    return textSurface, textSurface.get_rect()
 
 def IntroDisplay():                     #for the display of splash image in the begiining
     GameDisplay.blit(IntroImg,(0,0))
@@ -57,7 +55,8 @@ def Ground(x_ground):               #takes x coordinate of the ground and displa
 
 def BackGround():               #displays backgroung image with its top left at 0,0
     GameDisplay.blit(BackGroundImg,(0,0))
-
+                                
+                                #the reference from https://www.youtube.com/watch?v=kmXKFTu_IyQ for this function
 def MesssageDisplay(text):      #the string to be displayed is passed as text
     font = pygame.font.Font('freesansbold.ttf',80) #font style=fresanbold and size=80
     TextSurf=font.render(text, True, Black)   
