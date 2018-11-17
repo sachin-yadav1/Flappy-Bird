@@ -142,12 +142,12 @@ def GameLoop():
         #GameDisplay.fill(SkyBlue)
         BackGround()
         if flag:                        #used flag to allow alternate up and then down motion of bird
-            pos-=1
+            pos-=4
         else:
-            pos+=1
-        if pos==130:
+            pos+=4
+        if pos>=130:
             flag=1
-        elif pos==0:
+        elif pos<=0:
             flag=0    
         Bird(x,y+pos)                   #displays bird at passed coordinates
         MesssageDisplay("PRESS SPACEBAR TO START")
