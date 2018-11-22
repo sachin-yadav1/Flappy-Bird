@@ -27,20 +27,25 @@ pygame.display.set_caption("FLAPPY BIRD")       #written Flappy bird in title ba
 Clock=pygame.time.Clock()
                         #loading all the required images from the images folder
                         #some images were made in paint and other taken from internet
-BackGroundImg=pygame.image.load("Images\\bg img.png")
-BirdImg=pygame.image.load("Images\\bird img.png")
-GroundImg=pygame.image.load("Images\\ground2 img.png")
-IntroImg=pygame.image.load("Images\\intro img.png")
-PillarUpImg=pygame.image.load("Images\\pillar up img.png")
-PillarDownImg=pygame.image.load("Images\\pillar down img.png")
-GameOverImg=pygame.image.load("Images\\game over img.jpg")
+BackGroundImg=pygame.image.load("Images/bg img.png")
+#Different skins for the player
+BirdImg=pygame.image.load("Images/bird img.png")
+AirplaneImg=pygame.image.load("Images/airplane img.png")
+SupermanImg=pygame.image.load("Images/superman img.png")
+PlayerImg=BirdImg           #initial skin is bird image
+
+GroundImg=pygame.image.load("Images/ground2 img.png")
+IntroImg=pygame.image.load("Images/intro img.png")
+PillarUpImg=pygame.image.load("Images/pillar up img.png")
+PillarDownImg=pygame.image.load("Images/pillar down img.png")
+GameOverImg=pygame.image.load("Images/game over img.jpg")
                           #loading all the required sounds from sounds folder
                           #all sounds were taken from https://www.sounds-resource.com/mobile/flappybird/sound/5309/
-HitSound=pygame.mixer.Sound("Sounds\\sfx_hit.wav")
-DieSound=pygame.mixer.Sound("Sounds\\sfx_die.wav")
-PointSound=pygame.mixer.Sound("Sounds\\sfx_point.wav")
-SwooshSound=pygame.mixer.Sound("Sounds\\sfx_swoosh.wav")
-FlapSound=pygame.mixer.Sound("Sounds\\sfx_flap.wav")
+HitSound=pygame.mixer.Sound("Sounds/sfx_hit.wav")
+DieSound=pygame.mixer.Sound("Sounds/sfx_die.wav")
+PointSound=pygame.mixer.Sound("Sounds/sfx_point.wav")
+SwooshSound=pygame.mixer.Sound("Sounds/sfx_swoosh.wav")
+FlapSound=pygame.mixer.Sound("Sounds/sfx_flap.wav")
 
 def IntroDisplay():                     #for the display of splash image in the begiining
     GameDisplay.blit(IntroImg,(0,0))
@@ -48,7 +53,7 @@ def IntroDisplay():                     #for the display of splash image in the 
     pygame.time.delay(3000)   
 
 def Bird(x,y):              #takes x,y coordinates of the top left corner of bird and displays it
-    GameDisplay.blit(BirdImg,(x,y))
+    GameDisplay.blit(PlayerImg,(x,y))
 
 def Ground(x_ground):               #takes x coordinate of the ground and displays it
     GameDisplay.blit(GroundImg,(x_ground,DisplayHeight-GroundHeight))
@@ -63,6 +68,7 @@ def MesssageDisplay(text):      #the string to be displayed is passed as text
     TextRect=TextSurf.get_rect()             #gets text surface and the rectangle from the function
     TextRect.center = ((DisplayWidth/2),(DisplayHeight/2))   #text rectangle centre at mid 
     GameDisplay.blit(TextSurf, TextRect)
+    
     pygame.display.update()
 
 def PillarDisplay(x,y):                 #for displaying pillars
@@ -82,10 +88,10 @@ def ending(score):                      #executed when player quits or hits a pi
     GameDisplay.blit(GameOverImg,(0,0))         #displays gameover image
     font=pygame.font.Font('freesansbold.ttf',50)
     textSurface = font.render("YOUR SCORE: "+str(score), True, (255,0,0)) #displays player's final score
-    TextSurf, TextRect = textSurface, textSurface.get_rect()
-    TextRect.center = (DisplayWidth/2,ScoreDisplayHeight+200+300+100)
-    GameDisplay.blit(TextSurf, TextRect)
-    file=open("Logs\\score.txt","r")              #opens Logs\score.txt to check the previous highscore
+    """TextSurf, TextRect = textSurface, textSurface.get_rect()
+    TextRect.center = (DisplayWidth/2,ScoreDisplayHeight+200+300+100)"""
+    GameDisplay.blit(textSurface,((DisplayWidth/2,ScoreDisplayHeight+200+300+100)))
+    file=open("Logs/score.txt","r")              #opens Logs\score.txt to check the previous highscore
     HighScore=max(score,int(file.readline()))      #finds new HighScore
     font=pygame.font.Font('freesansbold.ttf',50)   
     textSurface = font.render("HIGH SCORE: "+str(HighScore), True, (255,0,0))  #displays current HighScore
@@ -93,7 +99,7 @@ def ending(score):                      #executed when player quits or hits a pi
     TextRect.center = (DisplayWidth/2,ScoreDisplayHeight+200+75+300+100)
     GameDisplay.blit(TextSurf, TextRect)
     file.close()
-    file=open("Logs\\score.txt","w")
+    file=open("Logs/score.txt","w")
     file.write(str(HighScore))                      #writes updated high score to score.txt
     file.close()
     pygame.display.flip()
@@ -114,14 +120,9 @@ def GameLoop():
     y_change=0
     GroundVelocity=3        #velocity of pillars to move
     
-    x_ground=0                                  
-    x_pillar1=DisplayWidth+InitialPillar        #x location of pillars on screen
-    x_pillar2=x_pillar1+GapBetweenPillars
-    x_pillar3=x_pillar2+GapBetweenPillars
-   
-    y_pillar1=randint(60,680-GapSize)           #random loaction of gaps in pillars
-    y_pillar2=randint(60,680-GapSize)
-    y_pillar3=randint(60,680-GapSize)
+    x_ground=0     
+    x_pillar=[DisplayWidth+InitialPillar,DisplayWidth+InitialPillar+GapBetweenPillars,DisplayWidth+InitialPillar+2*GapBetweenPillars]                             
+    y_pillar=[ randint(60,680-GapSize) for i in range(3)]
     
     crashed=False                   #initially not crashed, not quitted, not started
     quit=False
@@ -176,60 +177,36 @@ def GameLoop():
             y+=y_change              #changes the y coordinate of bird
         y=y+Velocity
         Velocity+=0.18                  #velocity of falling bird incerases with time
-
-        x_pillar1-=GroundVelocity         #change x coordinates of pillars
-        x_pillar2-=GroundVelocity
-        x_pillar3-=GroundVelocity
-
-        if x_pillar1<-PillarWidth:                 #if a pillar vanishes at left of screen 
-            y_pillar1=randint(150,650-GapSize)
-            x_pillar1=1300                          #place it on right of screen
-        if x_pillar2<-PillarWidth:
-            y_pillar2=randint(150,650-GapSize)
-            x_pillar2=1300
-        if x_pillar3<-PillarWidth:
-            y_pillar3=randint(150,650-GapSize)
-            x_pillar3=1300
+#this increase stimulates gravity in game
+        x_pillar=[ (x_pillar[i]-GroundVelocity) for i in range(3)]
           
-        #GameDisplay.fill(SkyBlue)
         BackGround()
         x_ground-=GroundVelocity            #ground also seems to move
         if x_ground<-600:                    #reset ground if gone too left
             x_ground=0
         GroundVelocity+=GroundVelocityIncrease   #increase spped of pillars as game continues
 
-        PillarDisplay(x_pillar1,y_pillar1)          #displays the upper and lower pillar
-        PillarDisplay(x_pillar2,y_pillar2)
-        PillarDisplay(x_pillar3,y_pillar3)
-        
+        for i in range(3):
+            PillarDisplay(x_pillar[i],y_pillar[i])
+
         Ground(x_ground)     #displays ground and then bird in next line
         Bird(x,y)
         
-        if 300-(GroundVelocity/2)<x_pillar1+PillarWidth<=300+(GroundVelocity/2):    #condition for increase in score
-            Score+=1                                                                #when bird has successfully dodged pillar
-            pygame.mixer.Sound.play(PointSound)
-        if 300-(GroundVelocity/2)<x_pillar2+PillarWidth<=300+(GroundVelocity/2): 
-            Score+=1  
-            pygame.mixer.Sound.play(PointSound)
-        if 300-(GroundVelocity/2)<x_pillar3+PillarWidth<=300+(GroundVelocity/2):
-            Score+=1  
-            pygame.mixer.Sound.play(PointSound)
-
+        for i in range(3):
+            if x_pillar[i]<-PillarWidth:
+               y_pillar[i]=randint(150,650-GapSize)
+               x_pillar[i]=1300 
+            if 300-(GroundVelocity/2)<x_pillar[i]+PillarWidth<=300+(GroundVelocity/2): 
+                Score+=1  
+                pygame.mixer.Sound.play(PointSound)
+            if x-PillarWidth<=x_pillar[i]<=x+BirdWidth:
+                if not (y>y_pillar[i] and y+BirdHeight<y_pillar[i]+GapSize):    #when bird hits pillar2
+                    crashed=True
 
         ScoreDisplay("Score: "+str(Score))   #to call function to display current score
        
         if y+BirdHeight>DisplayHeight-GroundHeight:   #when it hits the ground
             crashed=True
-
-        if x-PillarWidth<=x_pillar1<=x+BirdWidth:           
-            if not (y>y_pillar1 and y+BirdHeight<y_pillar1+GapSize):  #when bird hits pillar1
-                crashed=True
-        if x-PillarWidth<=x_pillar2<=x+BirdWidth:
-            if not (y>y_pillar2 and y+BirdHeight<y_pillar2+GapSize):    #when bird hits pillar2
-                crashed=True
-        if x-PillarWidth<=x_pillar3<=x+BirdWidth:
-            if not (y>y_pillar3 and y+BirdHeight<y_pillar3+GapSize):    #when bird hits pillar3
-                crashed=True
         
         if crashed:
             pygame.time.delay(2000)
