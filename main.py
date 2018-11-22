@@ -37,7 +37,7 @@ Clock=pygame.time.Clock()
 #loading all the required images from the images folder                        
 #some images were made in paint and other taken from internet
 BackGroundImg=pygame.image.load("Images/bg img.png")
-
+#Images are edited using https://www110.lunapic.com/editor/ 
 #Different skins for the player
 BirdImg=pygame.image.load("Images/bird img.png")
 AirplaneImg=pygame.image.load("Images/airplane img.png")
@@ -63,7 +63,7 @@ def IntroDisplay():                     #for the display of splash image in the 
     pygame.display.flip()
     pygame.time.delay(3000)   
 
-#to chnage character's image as per the mode chosen
+#to change character's image as per the mode chosen
 def PlayerMode(Mode):
     global PlayerImg                
     if Mode==0:
@@ -151,22 +151,22 @@ def GameLoop():
     
     #waits till player starts the game
     while not start:                
-        global Mode                        #waiting till player starts by pressing any key
+        global Mode                        #waiting till player starts by pressing spacebar
         for event in pygame.event.get():
             if event.type==pygame.QUIT:             #if player clicks close
                 pygame.display.flip()
                 pygame.quit()
                 _exit(0)
             if event.type==pygame.KEYDOWN:             
-                if event.key==pygame.K_s:
+                if event.key==pygame.K_s:           #change character's mode by changing mode
                     Mode+=1
                     if Mode==3:
                         Mode=0
-                if event.key==pygame.K_SPACE:
+                if event.key==pygame.K_SPACE:          #if pressed spacebar ,the game starts
                     start=True
                     pygame.mixer.Sound.play(SwooshSound)
-        PlayerMode(Mode)
-        #GameDisplay.fill(SkyBlue)
+        PlayerMode(Mode)                        #updates the mode as chosen
+    
         BackGround()
         if flag:                        #used flag to allow alternate up and then down motion of bird
             pos-=4
@@ -193,45 +193,51 @@ def GameLoop():
 
             if event.type == pygame.KEYDOWN and y>0:    #if pressed spacebar key down
                 if event.key== pygame.K_SPACE and y>0:
-                    y_change-=UPstep
+                    y_change-=UPstep                       #changes y coordinate by UPstep of bird
                     pygame.mixer.Sound.play(FlapSound)
 
             if event.type==pygame.KEYUP:                #if removed pressure from spacebar key
                 if event.key == pygame.K_SPACE:
                     y_change=0
-                    velocity=InitialVelocity    #resets falling velocity
+                    velocity=InitialVelocity    #resets falling velocity to initial velocity
         
             y+=y_change              #changes the y coordinate of bird
         y=y+velocity
         velocity+=Gravity                #velocity of falling bird incerases with time
 #this increase stimulates gravity in game
+        #causes movement of pillars along with ground in rate of ground velocity
         x_Pillar=[ (x_Pillar[i]-GroundVelocity) for i in range(3)]
           
         BackGround()
         x_ground-=GroundVelocity            #ground also seems to move
         if x_ground<-600:                    #reset ground if gone too left
             x_ground=0
-        GroundVelocity+=GroundVelocityIncrease   #increase spped of pillars as game continues
+        
+        GroundVelocity+=GroundVelocityIncrease   #increase speed and difficulty of pillars as game continues
 
         for i in range(3):
-            PillarDisplay(x_Pillar[i],y_Pillar[i])
+            PillarDisplay(x_Pillar[i],y_Pillar[i])          #displays the pillars
 
         Ground(x_ground)     #displays ground and then bird in next line
         Player(x_Bird,y)
         
-        for i in range(3):
-            if x_Pillar[i]<-PillarWidth:
+
+        for i in range(3):  
+            if x_Pillar[i]<-PillarWidth:        #if pillar vanishes on left, randomize its gap location
                y_Pillar[i]=randint(150,650-GapSize)
-               x_Pillar[i]=DisplayWidth
+               x_Pillar[i]=DisplayWidth            #place pillar on right edge then
+            #increases score when bird passes a pillar
             if x_Bird-(GroundVelocity/2)<x_Pillar[i]+PillarWidth<=x_Bird+(GroundVelocity/2): 
                 Score+=1  
                 pygame.mixer.Sound.play(PointSound)
+            #crash condition for bird with pillar
             if x_Bird-PillarWidth<=x_Pillar[i]<=x_Bird+BirdWidth:
                 if not (y>y_Pillar[i] and y+BirdHeight<y_Pillar[i]+GapSize):    #when bird hits pillar
                     crashed=True
 
         ScoreDisplay("Score: "+str(Score))   #to call function to display current score
        
+       #crash condition of bird with ground
         if y+BirdHeight>DisplayHeight-GroundHeight:   #when it hits the ground
             crashed=True
         
@@ -239,7 +245,7 @@ def GameLoop():
             pygame.time.delay(2000)
             pygame.mixer.Sound(HitSound)
 
-        if crashed or quit:     #if crashed or quitted , then take to gameover screen
+        if crashed or quit:     #if crashed or quitted , then take to gameover screen and show score
             ending(Score)
         
         pygame.display.flip()
